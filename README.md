@@ -5,9 +5,9 @@
 </p>
 
 <p align="center">
- <b>Kelas A</b><br>
- <b>Nurmadinah</b><br>
- <b>D0223001</b>
+ <b>Kelas F</b><br>
+ <b>M.Fajri Muallim</b><br>
+ <b>D0222372</b>
 </p>
 
 <p align="center">
