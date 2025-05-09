@@ -1,7 +1,7 @@
-<h1 align="center">📄 SuratDesa – Sistem Pembuatan Surat Otomatis di Kantor Desa</h1>
+<h1 align="center">📦 Sistem Informasi Pencatatan Barang – Manajemen Aset Kantor</h1>
 
 <p align="center">
-  <img src="logo-desa.png" alt="Logo Kantor Desa" width="120"/>
+  <img src="logo-kantor.png" alt="Logo Kantor" width="120"/>
 </p>
 
 <p align="center">
@@ -23,25 +23,27 @@
 ## 🎯 Role dan Fitur-fiturnya
 
 ### 1. Admin
-- Melihat dan mengelola permohonan surat dari warga.
-- Menyetujui atau menolak permintaan surat.
-- Mencetak atau mengunduh surat dalam format PDF.
-- Mengelola data pengguna dan sistem.
+- Menambahkan dan mengelola data barang atau aset kantor.
+- Mencatat pembelian barang baru.
+- Memperbarui kondisi barang (baik, rusak, hilang).
+- Menghapus atau menonaktifkan data barang yang tidak aktif.
+- Melihat laporan kondisi dan histori barang.
 
-### 2. Pengguna (Warga)
-- Mengajukan permintaan surat secara online.
-- Mengisi form sesuai data yang dibutuhkan.
-- Menunggu persetujuan dari admin.
-- Mencetak atau mengunduh surat jika disetujui.
+### 2. Pengguna (Staf / User)
+- Melihat daftar barang dan detail informasi aset.
+- Melihat kondisi dan status barang saat ini.
+- Melihat histori perubahan data barang (jika diizinkan).
 
 ---
 
-## 📨 Jenis Surat yang Didukung
+## 📋 Jenis Data yang Dicatat
 
-- Surat Keterangan Domisili  
-- Surat Pengantar Pembuatan KTP / KK  
-- Surat Pengantar Pindah Domisili  
-- Surat Keterangan Lahir  
+- Nama Barang  
+- Kategori Barang  
+- Tanggal Pembelian  
+- Kondisi Barang (Baik, Rusak, Hilang)  
+- Lokasi Penyimpanan  
+- Catatan atau Keterangan Tambahan  
 
 ---
 
@@ -58,42 +60,63 @@
 | role       | ENUM      | ['admin', 'user']             |
 | created_at | TIMESTAMP | Tanggal dibuat                |
 
-### 2. Tabel `surat_requests`
+### 2. Tabel `items`
 
-| Nama Field   | Tipe Data | Keterangan                                 |
-| ------------ | --------- | ------------------------------------------ |
-| id           | INT, PK   | ID permintaan surat                        |
-| user_id      | INT       | FK ke `users`                              |
-| surat_type   | ENUM      | ['domisili', 'ktpkk', 'pindah', 'lahir']   |
-| status       | ENUM      | ['pending', 'approved', 'rejected']        |
-| created_at   | TIMESTAMP | Tanggal permintaan                         |
-| updated_at   | TIMESTAMP | Tanggal terakhir update status             |
+| Nama Field     | Tipe Data | Keterangan                        |
+| -------------- | --------- | --------------------------------- |
+| id             | INT, PK   | ID unik barang                    |
+| name           | VARCHAR   | Nama barang                       |
+| category       | VARCHAR   | Kategori barang                   |
+| purchase_date  | DATE      | Tanggal pembelian barang          |
+| condition      | ENUM      | ['baik', 'rusak', 'hilang']       |
+| location       | VARCHAR   | Lokasi penyimpanan barang         |
+| notes          | TEXT      | Catatan tambahan (opsional)       |
+| created_at     | TIMESTAMP | Tanggal pencatatan barang         |
 
-### 3. Tabel `surat_data`
+### 3. Tabel `item_logs`
 
-| Nama Field   | Tipe Data | Keterangan                          |
-| ------------ | --------- | ----------------------------------- |
-| id           | INT, PK   | ID data surat                       |
-| request_id   | INT       | FK ke `surat_requests`              |
-| field_name   | VARCHAR   | Nama kolom isian (ex: nama, NIK)    |
-| field_value  | TEXT      | Nilai isian dari pengguna           |
+| Nama Field  | Tipe Data | Keterangan                                 |
+| ----------- | --------- | ------------------------------------------ |
+| id          | INT, PK   | ID log                                     |
+| item_id     | INT       | FK ke `items`                              |
+| action      | VARCHAR   | Aksi yang dilakukan (ex: tambah, ubah)     |
+| changed_by  | INT       | FK ke `users` yang melakukan perubahan     |
+| change_date | TIMESTAMP | Waktu perubahan                            |
+| details     | TEXT      | Deskripsi perubahan                        |
 
 ---
 
 ## 🔁 Relasi Antar Tabel
 
-- `users` ↔ `surat_requests` : One-to-Many  
-- `surat_requests` ↔ `surat_data` : One-to-Many  
+- `users` ↔ `item_logs` : One-to-Many  
+- `items` ↔ `item_logs` : One-to-Many  
 
 ---
 
-## 🔄 Alur Proses Pembuatan Surat
+## 🔄 Alur Penggunaan Sistem
 
-1. Pengguna login ke sistem.
-2. Memilih jenis surat yang akan diajukan.
-3. Mengisi formulir sesuai data yang diperlukan.
-4. Mengirim permintaan surat (status: `pending`).
-5. Admin memverifikasi dan menyetujui/tolak permintaan.
-6. Jika disetujui, surat dapat diunduh dalam bentuk PDF.
+1. Admin login ke sistem.
+2. Menambahkan data barang baru ke sistem.
+3. Jika ada perubahan status barang, admin memperbarui data (misalnya menjadi "rusak" atau "hilang").
+4. Semua perubahan tercatat otomatis di tabel `item_logs`.
+5. Pengguna dapat login untuk melihat daftar barang dan informasi terkini tanpa dapat mengubah data.
 
 ---
+
+## 🛠️ Teknologi yang Digunakan
+
+- PHP / Laravel (opsional)
+- MySQL / MariaDB
+- Bootstrap / TailwindCSS
+- JavaScript / Vue.js (jika ada)
+- DomPDF (untuk ekspor PDF, jika diperlukan)
+
+---
+
+## 📌 Catatan
+
+- Sistem ini dirancang agar data aset kantor tercatat secara digital dan mudah dilacak.
+- Admin bertanggung jawab menjaga keakuratan dan kelengkapan data.
+
+---
+
